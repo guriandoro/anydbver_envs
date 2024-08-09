@@ -36,7 +36,7 @@ bash /run_citus.sh
 EOF
 
 for node in node0 node1 node2 node3; do
-  echo "## Setup for" $node
+  echo; echo "## Setup for" $node
   docker cp ./run_alters.sql citus-$(whoami|tr '.' '-')-$node:run_alters.sql
   docker cp ./run_citus.sh citus-$(whoami|tr '.' '-')-$node:run_citus.sh
   docker cp ./run_setup.sh citus-$(whoami|tr '.' '-')-$node:run_setup.sh
@@ -44,9 +44,11 @@ for node in node0 node1 node2 node3; do
 done
 
 # On coordinator node only
-anydbver --namespace=citus exec node0
-psql -U postgres db01 -c "SELECT citus_set_coordinator_host('node0', 5432);"
-psql -U postgres db01 -c "SELECT citus_add_node('node1', 5432);"
-psql -U postgres db01 -c "SELECT citus_add_node('node2', 5432);"
-psql -U postgres db01 -c "SELECT citus_add_node('node3', 5432);"
-psql -U postgres db01 -c "SELECT citus_get_active_worker_nodes();"
+# anydbver --namespace=citus exec node0
+{
+echo "SELECT citus_set_coordinator_host('node0', 5432);"
+echo "SELECT citus_add_node('node1', 5432);"
+echo "SELECT citus_add_node('node2', 5432);"
+echo "SELECT citus_add_node('node3', 5432);"
+echo "SELECT citus_get_active_worker_nodes();"
+} | psql -Upostgres db01
