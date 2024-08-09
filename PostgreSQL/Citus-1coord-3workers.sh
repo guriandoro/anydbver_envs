@@ -89,3 +89,7 @@ INSERT INTO myevents (device_id, data)
 # We can use the "get" queries above to see how stats changed for table and shard sizes
 SELECT * FROM citus_tables;
 SELECT * FROM citus_shards;
+
+# Explain query
+SET citus.explain_all_tasks = 1;
+EXPLAIN (ANALYZE, VERBOSE, BUFFERS) SELECT * FROM myevents WHERE device_id=36 OR device_id=100;
