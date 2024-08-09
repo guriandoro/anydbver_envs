@@ -4,6 +4,9 @@ node1 pg:latest \
 node2 pg:latest \
 node3 pg:latest 
 
+# Check network address, if needed, to change pg_hba.conf rule
+anydbver --namespace=citus exec node0 -- ip a
+
 cat <<EOF >run_alters.sql
  alter system set wal_level = 'logical';
  alter system set listen_addresses = '*';
@@ -22,7 +25,7 @@ echo -n "Running setup in: "
 hostname
 yum -y install citus_16.x86_64
 sudo -u postgres psql < run_alters.sql
-sed -i -e 's/local   all             all/hostssl all all 0.0.0.0\/0 trust\nlocal all all/' /var/lib/pgsql/16/data/pg_hba.conf
+sed -i -e 's/local   all             all/hostssl all all 192.168.0.0\/8 trust\nlocal all all/' /var/lib/pgsql/16/data/pg_hba.conf
 cd /var/lib/pgsql/16/data/
 openssl req -nodes -new -x509 -keyout server.key -out server.crt -subj '/C=US/L=NYC/O=Percona/CN=postgres'
 chmod 400 server.{crt,key}
