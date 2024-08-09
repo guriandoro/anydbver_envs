@@ -7,7 +7,7 @@ node3 pg:latest
 # Check network address, if needed, to change pg_hba.conf rule
 anydbver --namespace=citus exec node0 -- ip a
 
-cat <<EOF >run_alters.sql
+cat <<EOF >/tmp/run_alters.sql
  alter system set wal_level = 'logical';
  alter system set listen_addresses = '*';
  alter system set ssl = 'on';
@@ -16,11 +16,11 @@ cat <<EOF >run_alters.sql
  create database db01;
 EOF
 
-cat <<EOF >run_citus.sh
+cat <<EOF >/tmp/run_citus.sh
  sudo -u postgres psql db01 -c "create extension citus";
 EOF
 
-cat <<EOF >run_setup.sh
+cat <<EOF >/tmp/run_setup.sh
 echo -n "Running setup in: "
 hostname
 yum -y install citus_16.x86_64
@@ -37,9 +37,9 @@ EOF
 
 for node in node0 node1 node2 node3; do
   echo; echo "## Setup for" $node
-  docker cp ./run_alters.sql citus-$(whoami|tr '.' '-')-$node:run_alters.sql
-  docker cp ./run_citus.sh citus-$(whoami|tr '.' '-')-$node:run_citus.sh
-  docker cp ./run_setup.sh citus-$(whoami|tr '.' '-')-$node:run_setup.sh
+  docker cp /tmp/run_alters.sql citus-$(whoami|tr '.' '-')-$node:run_alters.sql
+  docker cp /tmp/run_citus.sh citus-$(whoami|tr '.' '-')-$node:run_citus.sh
+  docker cp /tmp/run_setup.sh citus-$(whoami|tr '.' '-')-$node:run_setup.sh
   anydbver --namespace=citus exec $node -- bash run_setup.sh
 done
 
