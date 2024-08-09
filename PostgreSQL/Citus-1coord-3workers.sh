@@ -44,11 +44,10 @@ for node in node0 node1 node2 node3; do
 done
 
 # On coordinator node only
-# anydbver --namespace=citus exec node0
 {
 echo "SELECT citus_set_coordinator_host('node0', 5432);"
 echo "SELECT citus_add_node('node1', 5432);"
 echo "SELECT citus_add_node('node2', 5432);"
 echo "SELECT citus_add_node('node3', 5432);"
 echo "SELECT citus_get_active_worker_nodes();"
-} | psql -Upostgres db01
+} | anydbver --namespace=citus exec node0 -- sudo -u postgres psql -Upostgres db01
