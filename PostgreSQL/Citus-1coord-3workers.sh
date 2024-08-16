@@ -45,6 +45,9 @@ echo "SELECT citus_add_node('node3', 5432);"
 echo "SELECT citus_get_active_worker_nodes();"
 } | anydbver --namespace=citus exec node0 -- sudo -u postgres psql -Upostgres db01
 
+
+### END OF SCRIPT ###
+
 # Some misc tests
 # Connect to coordinator
 anydbver --namespace=citus exec node0 -- sudo -u postgres psql -Upostgres db01
