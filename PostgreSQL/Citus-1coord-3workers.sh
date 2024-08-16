@@ -1,3 +1,5 @@
+#!/bin/bash
+
 anydbver --namespace=citus deploy \
 node0 pg:latest \
 node1 pg:latest \
