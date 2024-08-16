@@ -12,9 +12,8 @@ echo "IP address for node0 is" $ANYNET
 
 # Run setup steps on all nodes
 for NODE in node0 node1 node2 node3; do
-  echo; echo "## Setup for" $NODE
   anydbver --namespace=citus exec $NODE <<EOF
-echo -n "Running setup in: "
+echo; echo -n "# Running setup in: "
 hostname
 yum -q -y install citus_16.x86_64
 {
@@ -22,15 +21,17 @@ echo "alter system set wal_level = 'logical';"
 echo "alter system set listen_addresses = '*';"
 echo "alter system set ssl = 'on';"
 echo "show shared_preload_libraries;"
-echo "alter system set shared_preload_libraries = 'citus';"
+echo "alter system set shared_preload_libraries = citus,pg_stat_statements;"
 echo "create database db01;"
 } | sudo -u postgres psql
-echo "running sed"
+echo "# Running sed"
 sed -i -e '0,/^host / s/^host /hostssl all all ${ANYNET}\/24 trust\nhost /' /var/lib/pgsql/16/data/pg_hba.conf
 cd /var/lib/pgsql/16/data/
-openssl req -nodes -new -x509 -keyout server.key -out server.crt -subj '/C=US/L=NYC/O=Percona/CN=postgres'
+echo "# Running openssl"
+openssl req -nodes -new -x509 -keyout server.key -out server.crt -subj '/C=US/L=NYC/O=Percona/CN=postgres' 2>/dev/null
 chmod 400 server.{crt,key}
 chown postgres:postgres server.{crt,key}
+echo "# Restarting postgres service"
 systemctl restart postgresql-16
 sudo -u postgres psql db01 -c "create extension citus";
 EOF
@@ -44,7 +45,6 @@ echo "SELECT citus_add_node('node2', 5432);"
 echo "SELECT citus_add_node('node3', 5432);"
 echo "SELECT citus_get_active_worker_nodes();"
 } | anydbver --namespace=citus exec node0 -- sudo -u postgres psql -Upostgres db01
-
 
 ### END OF SCRIPT ###
 
