@@ -33,7 +33,7 @@ chmod 400 server.{crt,key}
 chown postgres:postgres server.{crt,key}
 echo "# Restarting postgres service"
 systemctl restart postgresql-16
-sudo -u postgres psql db01 -c "create extension citus";
+sudo -u postgres psql db01 -c "create extension citus; create extension pg_stat_statements;";
 EOF
 done
 
