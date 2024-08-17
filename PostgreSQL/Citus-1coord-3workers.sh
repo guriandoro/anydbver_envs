@@ -85,6 +85,9 @@ INSERT INTO myevents (device_id, data)
 SELECT * FROM citus_tables;
 SELECT * FROM citus_shards;
 
+# Get Citus queries
+SELECT * FROM citus_stat_statements;
+
 # Explain query
 SET citus.explain_all_tasks = 1;
 EXPLAIN (ANALYZE, VERBOSE, BUFFERS) SELECT * FROM myevents WHERE device_id=36 OR device_id=100;
