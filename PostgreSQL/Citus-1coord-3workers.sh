@@ -1,10 +1,10 @@
 #!/bin/bash
 
 anydbver --namespace=citus deploy \
-node0 pg:latest \
-node1 pg:latest \
-node2 pg:latest \
-node3 pg:latest 
+node0 pg:16 \
+node1 pg:16 \
+node2 pg:16 \
+node3 pg:16 
 
 # Get node0's IP address to automatically edit pg_hba.conf rule below
 ANYNET=`anydbver --namespace=citus exec node0 -- ip a | grep "inet " | grep -v "127.0.0.1" | awk '{print $2}' | cut -d '/' -f1`
