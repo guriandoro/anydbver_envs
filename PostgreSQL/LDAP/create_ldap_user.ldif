@@ -1,0 +1,46 @@
+# This LDIF file defines the complete LDAP directory structure for PostgreSQL authentication:
+#
+# Directory Structure:
+# - dc=percona,dc=local (base DN)
+#   └── ou=dbusers (organizational unit for database users)
+#       └── uid=pguser (test database user)
+#
+# Credentials:
+# - LDAP Admin:
+#   DN: cn=ldapadm,dc=percona,dc=local
+#   Password: secret
+#
+# - Test Database User:
+#   Username: pguser
+#   Password: secret123
+#   Full DN: uid=pguser,ou=dbusers,dc=percona,dc=local
+
+# Create the base DN
+dn: dc=percona,dc=local
+objectClass: top
+objectClass: dcObject
+objectClass: organization
+o: Percona
+dc: percona
+
+# Create organizational unit for database users
+dn: ou=dbusers,dc=percona,dc=local
+objectClass: organizationalUnit
+ou: dbusers
+
+# Create a test database user with attributes needed for PostgreSQL authentication
+dn: uid=pguser,ou=dbusers,dc=percona,dc=local
+objectClass: inetOrgPerson
+objectClass: posixAccount
+objectClass: shadowAccount
+uid: pguser
+sn: PG
+givenName: User
+cn: PG User
+displayName: PG User
+uidNumber: 10000
+gidNumber: 10000
+userPassword: secret123
+loginShell: /bin/bash
+homeDirectory: /home/pguser
+mail: pguser@percona.local 
