@@ -47,7 +47,7 @@ anydbver_cp "$NAMESPACE" create_ldap_user.ldif "node0:/"
 # Add the user to LDAP using the admin credentials
 # This creates both the ou=dbusers organizational unit and the pguser user
 echo "Adding new user to LDAP..."
-anydbver -n $NAMESPACE exec node0 -- ldapadd -x -D "cn=ldapadm,dc=percona,dc=local" -w secret -f /create_ldap_user.ldif
+anydbver -n $NAMESPACE exec node0 -- ldapadd -c -x -D "cn=ldapadm,dc=percona,dc=local" -w secret -f /create_ldap_user.ldif
 
 # Verify the user was added by performing an LDAP search
 # This confirms the user exists and shows all attributes

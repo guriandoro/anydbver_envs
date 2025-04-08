@@ -43,4 +43,4 @@ gidNumber: 10000
 userPassword: secret123
 loginShell: /bin/bash
 homeDirectory: /home/pguser
-mail: pguser@percona.local 
+mail: pguser@percona.local

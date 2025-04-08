@@ -72,5 +72,6 @@ anydbver -n $NAMESPACE exec node1 -- sudo systemctl reload postgresql-17
 
 echo "Configuration completed!"
 echo "You can now connect to PostgreSQL using:"
-echo "1. Local connection (peer auth): sudo -u postgres psql"
-echo "2. Remote connection (LDAP auth): psql -h localhost -U pguser -d testdb" 
+echo "1. Local connection (peer auth): anydbver -n $NAMESPACE exec node1 -- sudo -u postgres psql"
+node1_ip=`anydbver -n $NAMESPACE exec node1 -- ip a | grep "inet " | grep -v "127.0.0.1" | awk '{print $2}' | cut -d/ -f1`
+echo "2. Remote connection (LDAP auth): anydbver -n $NAMESPACE exec node1 -- psql -h $node1_ip -U pguser -d testdb"
