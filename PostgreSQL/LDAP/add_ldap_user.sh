@@ -30,12 +30,24 @@ NAMESPACE="pg-ldap"
 # Copy the LDIF file to the container
 # The file contains definitions for a new organizational unit and user
 echo "Copying LDIF file to LDAP server container..."
-anydbver -n $NAMESPACE cp create_ldap_user.ldif node0:/tmp/
+# Helper function to copy files to containers using docker cp
+anydbver_cp() {
+    local namespace=$1
+    local src=$2 
+    local dest=$3
+    local node="${dest%%:*}"
+    local container_path="${dest#*:}"
+    local user=$(whoami | tr '.' '-')
+    local container_name="${namespace}-${user}-${node}"
+    docker cp "$src" "$container_name:$container_path"
+}
+
+anydbver_cp "$NAMESPACE" create_ldap_user.ldif "node0:/"
 
 # Add the user to LDAP using the admin credentials
 # This creates both the ou=dbusers organizational unit and the pguser user
 echo "Adding new user to LDAP..."
-anydbver -n $NAMESPACE exec node0 -- ldapadd -x -D "cn=ldapadm,dc=percona,dc=local" -w secret -f /tmp/create_ldap_user.ldif
+anydbver -n $NAMESPACE exec node0 -- ldapadd -x -D "cn=ldapadm,dc=percona,dc=local" -w secret -f /create_ldap_user.ldif
 
 # Verify the user was added by performing an LDAP search
 # This confirms the user exists and shows all attributes
