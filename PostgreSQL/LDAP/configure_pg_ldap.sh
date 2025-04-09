@@ -42,19 +42,26 @@ EOT
 # Add LDAP configuration to pg_hba.conf
 echo "Configuring PostgreSQL to use LDAP authentication..."
 # Create a temporary file with the LDAP configuration
-anydbver -n $NAMESPACE exec node1 -- bash -c "cat > /tmp/ldap_config.txt << 'EOT'
-# Local connections (peer authentication)
+anydbver -n $NAMESPACE exec node1 -- sudo -u postgres bash -c "cat > /tmp/pg_hba.conf << 'EOT'
+# TYPE  DATABASE        USER            ADDRESS                 METHOD
 local   all             all                                     peer
-
+# IPv4 and IPv6 local connections:
+host    all             all             127.0.0.1/32           scram-sha-256
+host    all             all             ::1/128                scram-sha-256
 # LDAP authentication
-host    all    all    all    ldap \
-    ldapserver=node0 \
-    ldapport=389 \
-    ldapbasedn=\"dc=percona,dc=local\" \
-    ldapsearchfilter=\"(uid=\$username)\" \
-    ldapbinddn=\"cn=ldapadm,dc=percona,dc=local\" \
-    ldapbindpasswd=\"secret\"
+host    all             all             0.0.0.0/0              ldap ldapserver=node0 ldapport=389 ldapbasedn=\"dc=percona,dc=local\" ldapsearchfilter=\"(uid=\$username)\" ldapbinddn=\"cn=ldapadm,dc=percona,dc=local\" ldapbindpasswd=\"secret\"
+# The rest of connections using md5
+host    all             all             0.0.0.0/0              md5
 EOT"
+
+# Show the pg_hba.conf file
+#anydbver -n $NAMESPACE exec node1 -- sudo -u postgres bash -c "cat /tmp/pg_hba.conf"
+
+# Backup the original pg_hba.conf
+anydbver -n $NAMESPACE exec node1 -- sudo -u postgres bash -c "mv /var/lib/pgsql/17/data/pg_hba.conf /var/lib/pgsql/17/data/pg_hba.conf.bak"
+
+# Replace the pg_hba.conf with the new configuration
+anydbver -n $NAMESPACE exec node1 -- sudo -u postgres bash -c "mv /tmp/pg_hba.conf /var/lib/pgsql/17/data/pg_hba.conf"
 
 # Create a PostgreSQL role for the LDAP user
 echo "Creating PostgreSQL role for LDAP user..."
